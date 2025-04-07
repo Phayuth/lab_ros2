@@ -59,11 +59,11 @@ if __name__ == '__main__':
     # add the control to the interactive marker
     int_marker.controls.append(rotate_control_x)
 
-    # rotate_control_y = InteractiveMarkerControl()
-    # rotate_control_y.name = 'move_y'
-    # rotate_control_y.interaction_mode = InteractiveMarkerControl.MOVE_PLANE
+    rotate_control_y = InteractiveMarkerControl()
+    rotate_control_y.name = 'move_y'
+    rotate_control_y.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
 
-    # int_marker.controls.append(rotate_control_y)
+    int_marker.controls.append(rotate_control_y)
 
     # add the interactive marker to our collection &
     # tell the server to call processFeedback() when feedback arrives for it
