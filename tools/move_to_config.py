@@ -14,7 +14,7 @@ class PublisherJointTrajectory(Node):
         super().__init__(node_name="publish_joint_trajectory_position_controller")
         self.joints = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
 
-        self.pub = self.create_publisher(JointTrajectory, "/joint_trajectory_controller/joint_trajectory", 1)
+        self.pub = self.create_publisher(JointTrajectory, "/scaled_joint_trajectory_controller/joint_trajectory", 1)
         self.timer = self.create_timer(1, callback=self.timer_callback)
 
     def timer_callback(self):

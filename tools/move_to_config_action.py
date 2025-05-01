@@ -11,14 +11,25 @@ class JointTrajectoryControllerClient(rclpy.node.Node):
 
     def __init__(self):
         super().__init__("joint_trajectory_controller_client")
-        self.actcli = ActionClient(self, FollowJointTrajectory, "/joint_trajectory_controller/follow_joint_trajectory")
-        self.jntNames = ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+        self.actcli = ActionClient(self, FollowJointTrajectory, "/scaled_joint_trajectory_controller/follow_joint_trajectory")
+        self.jntNames = [
+            "ur5e_shoulder_pan_joint",
+            "ur5e_shoulder_lift_joint",
+            "ur5e_elbow_joint",
+            "ur5e_wrist_1_joint",
+            "ur5e_wrist_2_joint",
+            "ur5e_wrist_3_joint",
+        ]
 
         # trajectory data
-        self.pos = np.array([[0.0, -2.0, 1.0, 0.5, -1.0, 0.0],
-                             [1.0, -1.0, -1.0, 1.0, 1.0, 1.0],
-                             [0.0, -1.0, -1.0, -1.0, 0.0, 0.0],
-                             [1.0, -0.5, -1.0, 1.0, 1.0, -1.0],]).T
+        self.pos = np.array(
+            [
+                [0.0, -2.0, 1.0, 0.5, -1.0, 0.0],
+                [1.0, -1.0, -1.0, 1.0, 1.0, 1.0],
+                [0.0, -1.0, -1.0, -1.0, 0.0, 0.0],
+                [1.0, -0.5, -1.0, 1.0, 1.0, -1.0],
+            ]
+        ).T
 
         # if provide, will use cubic continuous
         # self.velo = np.array([[0.1, 1.0, 1.0, 1.0, 1.0, 1.0],
@@ -26,10 +37,14 @@ class JointTrajectoryControllerClient(rclpy.node.Node):
         #                       [0.1, 1.0, 1.0, 1.0, 1.0, 1.0],
         #                       [0.1, 1.0, 1.0, 1.0, 1.0, 1.0],]).T
 
-        self.velo = np.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                              [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                              [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                              [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],]).T # all zeros, mean stop and each knot same as if not provide
+        self.velo = np.array(
+            [
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            ]
+        ).T  # all zeros, mean stop and each knot same as if not provide
 
         # self.velo = np.array([[0.0, 0.4, 0.4, 0.1, 0.1, 0.1],
         #                       [0.0, 0.4, 0.4, 0.1, 0.1, 0.1],
@@ -37,10 +52,14 @@ class JointTrajectoryControllerClient(rclpy.node.Node):
         #                       [0.0, 0.4, 0.4, 0.1, 0.1, 0.1],]).T
 
         # if provide, will use quintic countinous
-        self.acc = np.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                             [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],]).T
+        self.acc = np.array(
+            [
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            ]
+        ).T
 
         self.times = np.linspace(10.2, 40.8, 4)
 
@@ -51,8 +70,8 @@ class JointTrajectoryControllerClient(rclpy.node.Node):
         for i in range(self.pos.shape[1]):
             point = JointTrajectoryPoint()
             point.positions = self.pos[:, i].tolist()
-            point.velocities = self.velo[:,i].tolist() if self.velo is not None else [0.0]*6
-            point.accelerations = self.acc[:,i].tolist() if self.acc is not None else [0.0]*6
+            point.velocities = self.velo[:, i].tolist() if self.velo is not None else [0.0] * 6
+            point.accelerations = self.acc[:, i].tolist() if self.acc is not None else [0.0] * 6
             point.time_from_start = RCLDuration(seconds=self.times[i]).to_msg()
             gMsg.trajectory.points.append(point)
 

@@ -2,19 +2,22 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.substitutions import Command
 
+
 def generate_launch_description():
     arg1_value = "john"
     arg2_value = "cena"
 
-    robot_description_content = Command([
-        'xacro',
-        ' ',
-        'example_macro.urdf.xacro',
-        ' ',
-        'arg1_input:={}'.format(arg1_value),
-        ' ',
-        'arg2_input:={}'.format(arg2_value)
-    ]) # run terminal command
+    robot_description_content = Command(
+        [
+            "xacro",
+            " ",
+            "robot_macro.urdf.xacro",
+            " ",
+            f"arg1_input:={arg1_value}",
+            " ",
+            f"arg2_input:={arg2_value}",
+        ]
+    )  # run terminal command
 
     robot_description = {"robot_description": robot_description_content}
 
@@ -37,8 +40,10 @@ def generate_launch_description():
         output="both",
     )
 
-    return LaunchDescription([
-        robot_state_publisher_node,
-        robot_joint_state_pub_gui,
-        rvizer
-    ])
+    return LaunchDescription(
+        [
+            robot_state_publisher_node,
+            robot_joint_state_pub_gui,
+            rvizer,
+        ]
+    )

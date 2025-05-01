@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="example_robot">
 
-  <xacro:arg name="arg1_input" default=""/>
-  <xacro:arg name="arg2_input" default="jj"/>
+  <xacro:arg name="arg1_input" default="arg1_default"/>
+  <xacro:arg name="arg2_input" default="arg2_default"/>
 
-  <xacro:macro name="example_macro" params="link1_name link2_name">
+  <xacro:macro name="robot_macro" params="link1_name link2_name">
     <link name="${link1_name}">
       <visual>
         <geometry>
@@ -46,8 +46,8 @@
     </joint>
   </xacro:macro>
 
-  <!-- xacro example_macro.urdf.xacro arg1_input:=john arg2_input:=cena -->
-  <xacro:example_macro link1_name="$(arg arg1_input)" link2_name="$(arg arg2_input)">
-  </xacro:example_macro>
+  <!-- xacro robot_macro.urdf.xacro arg1_input:=john arg2_input:=cena -->
+  <xacro:robot_macro link1_name="$(arg arg1_input)" link2_name="$(arg arg2_input)">
+  </xacro:robot_macro>
 
 </robot>
