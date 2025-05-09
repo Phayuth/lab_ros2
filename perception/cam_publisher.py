@@ -8,9 +8,11 @@ import cv2
 class ImagePublisher(Node):
 
     def __init__(self):
-        super().__init__('image_publisher')
-        self.imgPublisher = self.create_publisher(Image, 'video_frames', 10)
-        self.timer = self.create_timer(timer_period_sec=0.1, callback=self.timer_callback)
+        super().__init__("image_publisher")
+        self.imgPublisher = self.create_publisher(Image, "video_frames", 10)
+        self.timer = self.create_timer(
+            timer_period_sec=0.1, callback=self.timer_callback
+        )
         self.cap = cv2.VideoCapture(4)
         self.br = CvBridge()
 
@@ -18,7 +20,7 @@ class ImagePublisher(Node):
         ret, frame = self.cap.read()
         if ret == True:
             self.imgPublisher.publish(self.br.cv2_to_imgmsg(frame))
-        self.get_logger().info('Publishing video frame')
+        self.get_logger().info("Publishing video frame")
 
 
 def main(args=None):
@@ -30,5 +32,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

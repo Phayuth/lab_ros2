@@ -29,7 +29,9 @@ class KDLChain:
 
     def forward_kinematics(self, joint_positions):
         if len(joint_positions) != self.jointnum:
-            raise ValueError("Joint positions length does not match the number of joints in the chain.")
+            raise ValueError(
+                "Joint positions length does not match the number of joints in the chain."
+            )
 
         joint_array = kdl.JntArray(self.jointnum)
         for i in range(self.jointnum):
@@ -42,20 +44,26 @@ class KDLChain:
 
     def inverse_kinematics(self, target_frame, initial_joint_positions):
         if len(initial_joint_positions) != self.jointnum:
-            raise ValueError("Initial joint positions length does not match the number of joints in the chain.")
+            raise ValueError(
+                "Initial joint positions length does not match the number of joints in the chain."
+            )
 
         initial_joint_array = kdl.JntArray(self.jointnum)
         for i in range(self.jointnum):
             initial_joint_array[i] = initial_joint_positions[i]
 
         final_joint_positions = kdl.JntArray(self.jointnum)
-        self.ik_solver.CartToJnt(initial_joint_array, target_frame, final_joint_positions)
+        self.ik_solver.CartToJnt(
+            initial_joint_array, target_frame, final_joint_positions
+        )
 
         return final_joint_positions
 
     def make_joint_array(self, joint_positions):
         if len(joint_positions) != self.jointnum:
-            raise ValueError("Joint positions length does not match the number of joints in the chain.")
+            raise ValueError(
+                "Joint positions length does not match the number of joints in the chain."
+            )
 
         joint_array = kdl.JntArray(self.jointnum)
         for i in range(self.jointnum):
@@ -86,7 +94,9 @@ class KDLChain:
 
     def make_joint_list(self, joint_positions):
         if len(joint_positions) != self.jointnum:
-            raise ValueError("Joint positions length does not match the number of joints in the chain.")
+            raise ValueError(
+                "Joint positions length does not match the number of joints in the chain."
+            )
 
         joint_list = []
         for i in range(self.jointnum):

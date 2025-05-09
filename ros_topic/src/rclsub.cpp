@@ -7,12 +7,20 @@ class MinimalSubscriber : public rclcpp::Node {
         rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 
         void topic_callback(const std_msgs::msg::String::SharedPtr std_msgs) {
-            RCLCPP_INFO(this->get_logger(), "I heard: '%s'", std_msgs->data.c_str());
+            RCLCPP_INFO(
+                this->get_logger(), "I heard: '%s'", std_msgs->data.c_str());
         }
 
     public:
-        MinimalSubscriber() : Node("minimal_subscriber") { // the callback function have 1 arg. so we use placeholder _1
-            subscription_ = this->create_subscription<std_msgs::msg::String>("topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, std::placeholders::_1));
+        MinimalSubscriber()
+            : Node("minimal_subscriber") { // the callback function have 1 arg. so
+                                           // we use placeholder _1
+            subscription_ = this->create_subscription<std_msgs::msg::String>(
+                "topic",
+                10,
+                std::bind(&MinimalSubscriber::topic_callback,
+                          this,
+                          std::placeholders::_1));
         }
 };
 

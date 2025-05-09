@@ -12,7 +12,9 @@ class ReadPointCloud(Node):
 
     def __init__(self):
         super().__init__("pointcloud_info_node")
-        self.pointcloudSub = self.create_subscription(PointCloud2, "/zed/zed_node/point_cloud/cloud_registered", self.run, 10)
+        self.pointcloudSub = self.create_subscription(
+            PointCloud2, "/zed/zed_node/point_cloud/cloud_registered", self.run, 10
+        )
 
     def run(self, msg):
         self.pointcloudSub.destroy()
@@ -21,7 +23,7 @@ class ReadPointCloud(Node):
         self.view_pcd(xyz, rgb)
 
         pcd = np.hstack((xyz, rgb))
-        self.view_pcd(pcd[:,0:3], pcd[:,3:6])
+        self.view_pcd(pcd[:, 0:3], pcd[:, 3:6])
 
     def method_sensor_py_no_rgb(self, msg):
         gen = pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True)
@@ -30,7 +32,9 @@ class ReadPointCloud(Node):
 
     def method_numpy_buffer(self, msg):
         # point cloud have 4 element xyzc
-        pointCloud = np.frombuffer(msg.data, dtype=np.float32).reshape(-1, msg.point_step // 4)
+        pointCloud = np.frombuffer(msg.data, dtype=np.float32).reshape(
+            -1, msg.point_step // 4
+        )
         nan_mask = np.isnan(pointCloud)
         nan_rows = np.any(nan_mask, axis=1)
         pcfiltered = pointCloud[~nan_rows]

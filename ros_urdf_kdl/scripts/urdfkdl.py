@@ -46,14 +46,29 @@ def _toKdlInertia(i):
     # specifies the inertia in the inertia reference frame
     origin = _toKdlPose(i.origin)
     inertia = i.inertia
-    return origin.M * kdl.RigidBodyInertia(i.mass, origin.p, kdl.RotationalInertia(inertia.ixx, inertia.iyy, inertia.izz, inertia.ixy, inertia.ixz, inertia.iyz))
+    return origin.M * kdl.RigidBodyInertia(
+        i.mass,
+        origin.p,
+        kdl.RotationalInertia(
+            inertia.ixx,
+            inertia.iyy,
+            inertia.izz,
+            inertia.ixy,
+            inertia.ixz,
+            inertia.iyz,
+        ),
+    )
 
 
 def _toKdlJoint(jnt):
 
     fixed = lambda j, F: kdl.Joint(j.name, kdl.Joint.Fixed)
-    rotational = lambda j, F: kdl.Joint(j.name, F.p, F.M * kdl.Vector(*j.axis), kdl.Joint.RotAxis)
-    translational = lambda j, F: kdl.Joint(j.name, F.p, F.M * kdl.Vector(*j.axis), kdl.Joint.TransAxis)
+    rotational = lambda j, F: kdl.Joint(
+        j.name, F.p, F.M * kdl.Vector(*j.axis), kdl.Joint.RotAxis
+    )
+    translational = lambda j, F: kdl.Joint(
+        j.name, F.p, F.M * kdl.Vector(*j.axis), kdl.Joint.TransAxis
+    )
 
     type_map = {
         "fixed": fixed,
@@ -83,7 +98,12 @@ def _add_children_to_tree(robot_model, root, tree):
     parent_joint = robot_model.joint_map[parent_joint_name]
 
     # construct the kdl segment
-    sgm = kdl.Segment(root.name, _toKdlJoint(parent_joint), _toKdlPose(parent_joint.origin), inert)
+    sgm = kdl.Segment(
+        root.name,
+        _toKdlJoint(parent_joint),
+        _toKdlPose(parent_joint.origin),
+        inert,
+    )
 
     # add segment to tree
     if not tree.addSegment(sgm, parent_link_name):
@@ -92,7 +112,9 @@ def _add_children_to_tree(robot_model, root, tree):
     if root.name not in robot_model.child_map:
         return True
 
-    children = [robot_model.link_map[l] for (j, l) in robot_model.child_map[root.name]]
+    children = [
+        robot_model.link_map[l] for (j, l) in robot_model.child_map[root.name]
+    ]
 
     # recurslively add all children
     for child in children:
@@ -112,16 +134,20 @@ def treeFromUrdfModel(robot_model, quiet=False):
 
     root = robot_model.link_map[robot_model.get_root()]
     print("The root link is %s" % root.name)
-    print(dir(robot_model))
     if root.inertial and not quiet:
-        print("The root link %s has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF." % root.name)
+        print(
+            "The root link %s has an inertia specified in the URDF, but KDL does not support a root link with an inertia.  As a workaround, you can add an extra dummy link to your URDF."
+            % root.name
+        )
 
     ok = True
     tree = kdl.Tree(root.name)
 
     #  add all children
     for joint, child in robot_model.child_map[root.name]:
-        if not _add_children_to_tree(robot_model, robot_model.link_map[child], tree):
+        if not _add_children_to_tree(
+            robot_model, robot_model.link_map[child], tree
+        ):
             ok = False
             break
 

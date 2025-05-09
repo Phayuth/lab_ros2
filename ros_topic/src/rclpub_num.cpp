@@ -21,7 +21,8 @@ class PublishInterger : public rclcpp::Node {
         PublishInterger() : Node("int_pub") {
             pub_ = this->create_publisher<std_msgs::msg::Int64>("int", 10);
             using namespace std::chrono_literals;
-            timer_ = this->create_wall_timer(500ms, std::bind(&PublishInterger::timer_callback, this));
+            timer_ = this->create_wall_timer(
+                500ms, std::bind(&PublishInterger::timer_callback, this));
 
             this->declare_parameter("set_int", 0);
         }

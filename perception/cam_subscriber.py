@@ -9,10 +9,12 @@ class ImageSubscriber(Node):
 
     def __init__(self):
 
-        super().__init__('image_subscriber')
-        self.subscription = self.create_subscription(Image, '/camera/color/image_raw', self.listener_callback, 10)
+        super().__init__("image_subscriber")
+        self.subscription = self.create_subscription(
+            Image, "/camera/color/image_raw", self.listener_callback, 10
+        )
         self.br = CvBridge()
-        self.get_logger().info('Receiving video frame')
+        self.get_logger().info("Receiving video frame")
 
     def listener_callback(self, data):
         imgBGR = self.br.imgmsg_to_cv2(data)
@@ -29,5 +31,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

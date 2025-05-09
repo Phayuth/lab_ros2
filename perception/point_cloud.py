@@ -9,13 +9,19 @@ class PointCloudNoneOrderedPublisher(Node):
 
     def __init__(self):
         super().__init__("point_cloud_publisher")
-        self.pointCloudPub = self.create_publisher(PointCloud2, "point_cloud_topic", 10)
+        self.pointCloudPub = self.create_publisher(
+            PointCloud2, "point_cloud_topic", 10
+        )
         self.pointCloudTimer = self.create_timer(1.0, self.publish_point_cloud)
 
     def publish_point_cloud(self):
-        points = np.array([[0.1, 0.1, 0.0, 150, 10, 110],
-                           [0.2, 0.2, 0.0, 105, 255, 92],
-                           [0.3, 0.3, 0.0, 199, 214, 85]]).astype(np.float32)
+        points = np.array(
+            [
+                [0.1, 0.1, 0.0, 150, 10, 110],
+                [0.2, 0.2, 0.0, 105, 255, 92],
+                [0.3, 0.3, 0.0, 199, 214, 85],
+            ]
+        ).astype(np.float32)
         # xyzRGB  # unordered, to publish the ordered, we must fill the blank element with data
 
         msg = PointCloud2()
@@ -30,12 +36,54 @@ class PointCloudNoneOrderedPublisher(Node):
         byteSizePerPoint = points[0, 0].itemsize
         numberOfInfoPerPoint = len(points[0])  # xyzrgb = 6
 
-        msg.fields.append(PointField(name="x", offset=0 * byteSizePerPoint, datatype=PointField.FLOAT32, count=1))
-        msg.fields.append(PointField(name="y", offset=1 * byteSizePerPoint, datatype=PointField.FLOAT32, count=1))
-        msg.fields.append(PointField(name="z", offset=2 * byteSizePerPoint, datatype=PointField.FLOAT32, count=1))
-        msg.fields.append(PointField(name="r", offset=3 * byteSizePerPoint, datatype=PointField.FLOAT32, count=1))
-        msg.fields.append(PointField(name="g", offset=4 * byteSizePerPoint, datatype=PointField.FLOAT32, count=1))
-        msg.fields.append(PointField(name="b", offset=5 * byteSizePerPoint, datatype=PointField.FLOAT32, count=1))
+        msg.fields.append(
+            PointField(
+                name="x",
+                offset=0 * byteSizePerPoint,
+                datatype=PointField.FLOAT32,
+                count=1,
+            )
+        )
+        msg.fields.append(
+            PointField(
+                name="y",
+                offset=1 * byteSizePerPoint,
+                datatype=PointField.FLOAT32,
+                count=1,
+            )
+        )
+        msg.fields.append(
+            PointField(
+                name="z",
+                offset=2 * byteSizePerPoint,
+                datatype=PointField.FLOAT32,
+                count=1,
+            )
+        )
+        msg.fields.append(
+            PointField(
+                name="r",
+                offset=3 * byteSizePerPoint,
+                datatype=PointField.FLOAT32,
+                count=1,
+            )
+        )
+        msg.fields.append(
+            PointField(
+                name="g",
+                offset=4 * byteSizePerPoint,
+                datatype=PointField.FLOAT32,
+                count=1,
+            )
+        )
+        msg.fields.append(
+            PointField(
+                name="b",
+                offset=5 * byteSizePerPoint,
+                datatype=PointField.FLOAT32,
+                count=1,
+            )
+        )
 
         msg.is_bigendian = False
         msg.point_step = byteSizePerPoint * numberOfInfoPerPoint
@@ -51,7 +99,9 @@ class PointCloudOrderedReadDataNode(Node):
 
     def __init__(self):
         super().__init__("pointcloud_info_node")
-        self.pointcloudSub = self.create_subscription(PointCloud2, "/camera/depth/color/points", self.point_cloud_pub, 10)
+        self.pointcloudSub = self.create_subscription(
+            PointCloud2, "/camera/depth/color/points", self.point_cloud_pub, 10
+        )
 
     def point_cloud_pub(self, msg):
         pixel1_x = 490
@@ -73,7 +123,9 @@ class PointCloudOrderedReadDataNode(Node):
     def point_cloud2_to_array(self, msg):
         # point cloud must be in ordered
         # point cloud have 4 element xyzc
-        pointCloud = np.frombuffer(msg.data, dtype=np.float32).reshape(-1, msg.point_step // 4)[:, :4]
+        pointCloud = np.frombuffer(msg.data, dtype=np.float32).reshape(
+            -1, msg.point_step // 4
+        )[:, :4]
         return pointCloud
 
 

@@ -31,7 +31,7 @@ def processFeedback(feedback):
         # move all markers in that direction
         for i in range(len(positions)):
             (mx, my, mz) = positions[i]
-            d = sqrt(sqrt((x - mx)**2 + (y - my)**2)**2 + (z - mz)**2)
+            d = sqrt(sqrt((x - mx) ** 2 + (y - my) ** 2) ** 2 + (z - mz) ** 2)
             t = 1 / (d * 5.0 + 1.0) - 0.2
             if t < 0.0:
                 t = 0.0
@@ -89,7 +89,7 @@ def makeCube():
             for k in range(side_length):
                 z = step * k
                 marker = InteractiveMarker()
-                marker.header.frame_id = 'base_link'
+                marker.header.frame_id = "base_link"
                 marker.scale = step
 
                 marker.pose.position.x = x
@@ -105,12 +105,12 @@ def makeCube():
                 count += 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rclpy.init(args=sys.argv)
-    node = rclpy.create_node('cube')
+    node = rclpy.create_node("cube")
     g_logger = node.get_logger()
 
-    server = InteractiveMarkerServer(node, 'cube')
+    server = InteractiveMarkerServer(node, "cube")
 
     makeCube()
     server.applyChanges()

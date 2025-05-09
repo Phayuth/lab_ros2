@@ -9,17 +9,21 @@ class MinimalClient : public rclcpp::Node {
 
     public:
         MinimalClient() : Node("client") {
-            thread_ = std::thread(std::bind(&MinimalClient::call_add_two_int, this, 4, 1));
+            thread_ = std::thread(
+                std::bind(&MinimalClient::call_add_two_int, this, 4, 1));
         }
 
         void call_add_two_int(int a, int b) {
-            client_ = this->create_client<example_interfaces::srv::AddTwoInts>("add_srv");
+            client_ = this->create_client<example_interfaces::srv::AddTwoInts>(
+                "add_srv");
 
             while (!client_->wait_for_service(std::chrono::seconds(1))) {
-                RCLCPP_INFO(this->get_logger(), "The server is currently unavailable! waiting...");
+                RCLCPP_INFO(this->get_logger(),
+                            "The server is currently unavailable! waiting...");
             };
 
-            auto req = std::make_shared<example_interfaces::srv::AddTwoInts::Request>();
+            auto req =
+                std::make_shared<example_interfaces::srv::AddTwoInts::Request>();
             req->a = a;
             req->b = b;
 

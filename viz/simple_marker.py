@@ -9,21 +9,21 @@ from geometry_msgs.msg import Quaternion
 
 def processFeedback(feedback):
     p = feedback.pose.position
-    print(f'{feedback.marker_name} is now at {p.x}, {p.y}, {p.z}')
+    print(f"{feedback.marker_name} is now at {p.x}, {p.y}, {p.z}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     rclpy.init(args=sys.argv)
-    node = rclpy.create_node('simple_marker')
+    node = rclpy.create_node("simple_marker")
 
     # create an interactive marker server on the namespace simple_marker
-    server = InteractiveMarkerServer(node, 'namespace_marker')
+    server = InteractiveMarkerServer(node, "namespace_marker")
 
     # create an interactive marker for our server
     int_marker = InteractiveMarker()
-    int_marker.header.frame_id = 'base_link'
-    int_marker.name = 'my_marker'
-    int_marker.description = 'Simple 1-DOF Control Johncena Naruto'
+    int_marker.header.frame_id = "base_link"
+    int_marker.name = "my_marker"
+    int_marker.description = "Simple 1-DOF Control Johncena Naruto"
 
     # create a grey box marker
     box_marker = Marker()
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     rotate_control_x.orientation.x = 0.5
     rotate_control_x.orientation.y = 0.5
     rotate_control_x.orientation.z = 0.5
-    rotate_control_x.name = 'move_x'
+    rotate_control_x.name = "move_x"
     rotate_control_x.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
     rotate_control_x.orientation_mode = 0
 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     int_marker.controls.append(rotate_control_x)
 
     rotate_control_y = InteractiveMarkerControl()
-    rotate_control_y.name = 'move_y'
+    rotate_control_y.name = "move_y"
     rotate_control_y.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
 
     int_marker.controls.append(rotate_control_y)

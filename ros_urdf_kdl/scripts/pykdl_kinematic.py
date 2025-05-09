@@ -18,7 +18,9 @@ def make_kdl_from_dh():
 
     for i in range(len(theta)):
         joint = PyKDL.Joint(PyKDL.Joint.RotZ)
-        frame = PyKDL.Frame(PyKDL.Rotation.RotZ(theta[i]), PyKDL.Vector(a[i], -d[i], -alpha[i]))
+        frame = PyKDL.Frame(
+            PyKDL.Rotation.RotZ(theta[i]), PyKDL.Vector(a[i], -d[i], -alpha[i])
+        )
         segment = PyKDL.Segment(joint, frame)
         chain.addSegment(segment)
 
@@ -46,87 +48,64 @@ def make_kdl_from_urdf2():
 
 
 # chain = make_kdl_from_dh()
-# chain = make_kdl_from_urdf()
-chain = make_kdl_from_urdf2()
+chain = make_kdl_from_urdf()
+# chain = make_kdl_from_urdf2()
+numjoints = chain.getNrOfJoints()
 
 fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
 ik_solver = PyKDL.ChainIkSolverPos_LMA(chain)
 
-print(f"Number of Joints: {chain.getNrOfJoints()}")
 
-joint_positions = PyKDL.JntArray(chain.getNrOfJoints())
+# Forward Kinematics
+joint_positions = PyKDL.JntArray(numjoints)
 joint_positions[0] = 0.0
-joint_positions[1] = 0.0
-joint_positions[2] = 0.0
+joint_positions[1] = -1.57
+joint_positions[2] = 1.57
 joint_positions[3] = 0.0
-joint_positions[4] = 0.0
-joint_positions[5] = 0.0
+joint_positions[4] = 1.57
+joint_positions[5] = 1.57
 
-end_effector_frame = PyKDL.Frame()
-fk_solver.JntToCart(joint_positions, end_effector_frame)
+tool0INbaselink = PyKDL.Frame()
+fk_solver.JntToCart(joint_positions, tool0INbaselink)
 
-print(f"End-Effector Position: {end_effector_frame.p}")
-print(f"End-Effector Orientation: {end_effector_frame.M}")
+print(f"End-Effector Position: {tool0INbaselink.p}")
+print(f"End-Effector Orientation: {tool0INbaselink.M}")
 
+# Perform inverse kinematics
+target_frame = PyKDL.Frame()
+target_frame.p = PyKDL.Vector(
+    tool0INbaselink.p[0],
+    tool0INbaselink.p[1],
+    tool0INbaselink.p[2],
+)
+target_frame.M = PyKDL.Rotation.RPY(
+    tool0INbaselink.M.GetRPY()[0],
+    tool0INbaselink.M.GetRPY()[1],
+    tool0INbaselink.M.GetRPY()[2],
+)
 
-# # Perform forward kinematics
-# end_effector_frame = PyKDL.Frame()
-# fk_solver.JntToCart(joint_positions, end_effector_frame)
+initial_joint_positions = PyKDL.JntArray(numjoints)
+final_joint_positions = PyKDL.JntArray(numjoints)
+initial_joint_positions[0] = 0.0  # Joint 1 initial position in radians
+initial_joint_positions[1] = 0.0  # Joint 2 initial position in radians
+initial_joint_positions[2] = 0.0  # Joint 3 initial position in radians
+initial_joint_positions[3] = 0.0  # Joint 4 initial position in radians
+initial_joint_positions[4] = 0.0  # Joint 5 initial position in radians
+initial_joint_positions[5] = 0.0  # Joint 6 initial position in radians
+ik_solver.CartToJnt(initial_joint_positions, target_frame, final_joint_positions)
 
-# # Print the end-effector position and orientation
-# print(f"End-Effector Position: {end_effector_frame.p}")
-# print(f"End-Effector Orientation: {end_effector_frame.M.GetRPY()}")
-
-# # Create the inverse kinematics solver
-# ik_solver = PyKDL.ChainIkSolverPos_LMA(chain)
-
-# # Set target frame
-# target_frame = PyKDL.Frame()
-# target_frame.p = PyKDL.Vector(
-#     end_effector_frame.p[0],
-#     end_effector_frame.p[1],
-#     end_effector_frame.p[2],
-# )
-# target_frame.M = PyKDL.Rotation.RPY(
-#     end_effector_frame.M.GetRPY()[0],
-#     end_effector_frame.M.GetRPY()[1],
-#     end_effector_frame.M.GetRPY()[2],
-# )
-
-# # Perform inverse kinematics
-# initial_joint_positions = PyKDL.JntArray(chain.getNrOfJoints())
-# initial_joint_positions[0] = 0.0  # Joint 1 initial position in radians
-# initial_joint_positions[1] = 0.0  # Joint 2 initial position in radians
-# initial_joint_positions[2] = 0.0  # Joint 3 initial position in radians
-# initial_joint_positions[3] = 0.0  # Joint 4 initial position in radians
-# initial_joint_positions[4] = 0.0  # Joint 5 initial position in radians
-# initial_joint_positions[5] = 0.0  # Joint 6 initial position in radians
-
-# final_joint_positions = PyKDL.JntArray(chain.getNrOfJoints())
-# ik_solver.CartToJnt(initial_joint_positions, target_frame, final_joint_positions)
-
-# # Print the final joint positions
-# print("Final Joint Positions:")
-# for i in range(chain.getNrOfJoints()):
-#     print("Joint {}: {:.4f} rad".format(i + 1, final_joint_positions[i]))
-
-# # Set joint positions
-# joint_positions = PyKDL.JntArray(chain.getNrOfJoints())
-# joint_positions[0] = final_joint_positions[0]  # Joint 1 position in radians
-# joint_positions[1] = final_joint_positions[1]  # Joint 2 position in radians
-# joint_positions[2] = final_joint_positions[2]  # Joint 3 position in radians
-# joint_positions[3] = final_joint_positions[3]  # Joint 4 position in radians
-# joint_positions[4] = final_joint_positions[4]  # Joint 5 position in radians
-# joint_positions[5] = final_joint_positions[5]  # Joint 6 position in radians
-
-# # Perform forward kinematics
-# end_effector_frame = PyKDL.Frame()
-# fk_solver.JntToCart(joint_positions, end_effector_frame)
-
-# # Print the end-effector position and orientation
-# print(f"End-Effector Position: {end_effector_frame.p}")
-# print(f"End-Effector Orientation: {end_effector_frame.M.GetRPY()}")
+print("Final Joint Positions:")
+for i in range(numjoints):
+    print("Joint {}: {:.4f} rad".format(i + 1, final_joint_positions[i]))
 
 
-# print(dir(PyKDL))
-# print(help(PyKDL))
+# Wrench transformation
+tool0force = PyKDL.Vector(0.0, 0.0, -50.0)
+tool0torque = PyKDL.Vector(0.0, 0.0, 0.0)
+tool0wrench = PyKDL.Wrench(tool0force, tool0torque)
+
+baselinkwrench = PyKDL.Wrench()
+baselinkwrench = tool0INbaselink * tool0wrench
+print("Wrench in base_link frame:")
+print(f"Force: {baselinkwrench.force}")
+print(f"Torque: {baselinkwrench.torque}")

@@ -12,15 +12,18 @@ class MinimalPublisher : public rclcpp::Node {
             message.data = "Hello, world! " + std::to_string(count_++);
             publisher_->publish(message);
 
-            RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+            RCLCPP_INFO(
+                this->get_logger(), "Publishing: '%s'", message.data.c_str());
         }
 
     public:
         MinimalPublisher() : Node("minimal_publisher") { // constructor
-            publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+            publisher_ =
+                this->create_publisher<std_msgs::msg::String>("topic", 10);
 
             using namespace std::chrono_literals;
-            timer_ = this->create_wall_timer(500ms, std::bind(&MinimalPublisher::timer_callback, this));
+            timer_ = this->create_wall_timer(
+                500ms, std::bind(&MinimalPublisher::timer_callback, this));
         }
 };
 

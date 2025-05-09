@@ -26,7 +26,9 @@ class FrameListener(Node):
             print(f"> rotation: {rotation}")
 
         except TransformException as ex:
-            self.get_logger().info(f"Could not transform {parent} to {child}: {ex}")
+            self.get_logger().info(
+                f"Could not transform {parent} to {child}: {ex}"
+            )
 
 
 def main(args=None):

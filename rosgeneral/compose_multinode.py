@@ -3,7 +3,10 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int64, Int64
 from rclpy.executors import MultiThreadedExecutor, SingleThreadedExecutor
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
+from rclpy.callback_groups import (
+    MutuallyExclusiveCallbackGroup,
+    ReentrantCallbackGroup,
+)
 
 
 class NodeA(Node):
@@ -11,13 +14,17 @@ class NodeA(Node):
     def __init__(self):
         super().__init__("Subscriber_Node")
         self.cbgsub = ReentrantCallbackGroup()
-        self.subscription_1 = self.create_subscription(Int64, "topic_1", self.callback1, 1)
+        self.subscription_1 = self.create_subscription(
+            Int64, "topic_1", self.callback1, 1
+        )
         # self.subscription_2 = self.create_subscription(Int64, "topic_2", self.callback2, 2)
         self.j = 0
 
     def callback1(self, msg):
         # time.sleep(1)
-        self.get_logger().info(f"Callback1: {msg.data} at {hex(id(msg))} and is matched {msg.data == self.j}")
+        self.get_logger().info(
+            f"Callback1: {msg.data} at {hex(id(msg))} and is matched {msg.data == self.j}"
+        )
         self.j += 1
 
     def callback2(self, msg):

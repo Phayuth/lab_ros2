@@ -43,7 +43,9 @@ class PoseArraySubscriberNode(Node):
 
     def __init__(self):
         super().__init__("pose_array_subscriber_node")
-        self.subscription = self.create_subscription(PoseArray, "/pose_array_pub", self.pose_array_callback, 10)
+        self.subscription = self.create_subscription(
+            PoseArray, "/pose_array_pub", self.pose_array_callback, 10
+        )
 
     def pose_array_callback(self, msg):
         poses = msg.poses

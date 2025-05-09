@@ -44,7 +44,6 @@ h = check_same_timestamp(durationc, durationa)
 print(f"> h: {h}")
 
 
-
 timea = 12.23
 timeb = 12.23
 timec = 23.11

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="example_robot">
 
-  <xacro:arg name="arg1_input" default="arg1_default"/>
-  <xacro:arg name="arg2_input" default="arg2_default"/>
+  <xacro:arg name="arg1_input" default="arg1_default" />
+  <xacro:arg name="arg2_input" default="arg2_default" />
 
   <xacro:macro name="robot_macro" params="link1_name link2_name">
     <link name="${link1_name}">

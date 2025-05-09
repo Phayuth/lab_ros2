@@ -20,7 +20,8 @@ class ROS2TF2Lookup : public rclcpp::Node {
             // lookup the transform
             geometry_msgs::msg::TransformStamped transform_msg;
             try {
-                transform_msg = buffer.lookupTransform("odom", "base_link", rclcpp::Time(0));
+                transform_msg =
+                    buffer.lookupTransform("odom", "base_link", rclcpp::Time(0));
             } catch (tf2::TransformException &ex) {
                 RCLCPP_ERROR(this->get_logger(), ex.what());
             }

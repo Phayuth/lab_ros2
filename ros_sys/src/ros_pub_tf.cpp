@@ -7,10 +7,14 @@
 class TransformPublisher : public rclcpp::Node {
     public:
         TransformPublisher() : Node("transform_publisher") {
-            static_broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
-            dynamic_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+            static_broadcaster_ =
+                std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
+            dynamic_broadcaster_ =
+                std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
-            timer_ = this->create_wall_timer(std::chrono::milliseconds(500), std::bind(&TransformPublisher::publish_dynamic_transform, this));
+            timer_ = this->create_wall_timer(
+                std::chrono::milliseconds(500),
+                std::bind(&TransformPublisher::publish_dynamic_transform, this));
         }
 
     private:
@@ -35,8 +39,10 @@ class TransformPublisher : public rclcpp::Node {
             dynamic_transform.header.stamp = this->get_clock()->now();
             dynamic_transform.header.frame_id = "world";
             dynamic_transform.child_frame_id = "dynamic_frame";
-            dynamic_transform.transform.translation.x = sin(this->now().nanoseconds() / 1e9);
-            dynamic_transform.transform.translation.y = cos(this->now().nanoseconds() / 1e9);
+            dynamic_transform.transform.translation.x =
+                sin(this->now().nanoseconds() / 1e9);
+            dynamic_transform.transform.translation.y =
+                cos(this->now().nanoseconds() / 1e9);
             dynamic_transform.transform.translation.z = 0.0;
             dynamic_transform.transform.rotation.x = 0.0;
             dynamic_transform.transform.rotation.y = 0.0;

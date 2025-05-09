@@ -18,28 +18,52 @@ class ImageProcessor(Node):
         self.cvb = CvBridge()
 
         # camera info
-        self.imgLeftInfoSub = self.create_subscription(CameraInfo, "/camera_left/camera_info", self.cam_left_info_cb, 1)
-        self.imgRightInfoSub = self.create_subscription(CameraInfo, "/camera_right/camera_info", self.cam_right_info_cb, 1)
+        self.imgLeftInfoSub = self.create_subscription(
+            CameraInfo, "/camera_left/camera_info", self.cam_left_info_cb, 1
+        )
+        self.imgRightInfoSub = self.create_subscription(
+            CameraInfo, "/camera_right/camera_info", self.cam_right_info_cb, 1
+        )
 
         # camera data
-        self.imgLeftRawSub = self.create_subscription(Image, "/camera_left/image_raw", self.cam_left_image, 1, callback_group=self.cbg)
-        self.imgRightRawSub = self.create_subscription(Image, "/camera_right/image_raw", self.cam_right_image, 1, callback_group=self.cbg)
+        self.imgLeftRawSub = self.create_subscription(
+            Image,
+            "/camera_left/image_raw",
+            self.cam_left_image,
+            1,
+            callback_group=self.cbg,
+        )
+        self.imgRightRawSub = self.create_subscription(
+            Image,
+            "/camera_right/image_raw",
+            self.cam_right_image,
+            1,
+            callback_group=self.cbg,
+        )
         self.imgLeftMsg = None
         self.imgRightMsg = None
         self.pseudoMatchTime = Duration(seconds=0, nanoseconds=1000000)  # 0.01 sec
 
         # debug data
-        self.imgLeftDebugPub = self.create_publisher(Image, "/camera_left/image_debug", 5, callback_group=self.cbg)
-        self.imgRightDebugPub = self.create_publisher(Image, "/camera_right/image_debug", 5, callback_group=self.cbg)
+        self.imgLeftDebugPub = self.create_publisher(
+            Image, "/camera_left/image_debug", 5, callback_group=self.cbg
+        )
+        self.imgRightDebugPub = self.create_publisher(
+            Image, "/camera_right/image_debug", 5, callback_group=self.cbg
+        )
 
         # detection
         self.markerLength = 0.120  # m
         self.detectorParams = cv2.aruco.DetectorParameters()
         self.dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
-        self.detector = cv2.aruco.ArucoDetector(self.dictionary, self.detectorParams)
+        self.detector = cv2.aruco.ArucoDetector(
+            self.dictionary, self.detectorParams
+        )
 
         # processing data
-        self.timer_ = self.create_timer(0.040, self.process_images, callback_group=self.cbg)
+        self.timer_ = self.create_timer(
+            0.040, self.process_images, callback_group=self.cbg
+        )
         self.Once = True
 
     def cam_left_info_cb(self, msg: CameraInfo):
@@ -76,38 +100,64 @@ class ImageProcessor(Node):
         if self.imgLeftMsg is None or self.imgRightMsg is None:
             return
 
-        if Time.from_msg(self.imgLeftMsg.header.stamp) - Time.from_msg(self.imgRightMsg.header.stamp) < self.pseudoMatchTime:
+        if (
+            Time.from_msg(self.imgLeftMsg.header.stamp)
+            - Time.from_msg(self.imgRightMsg.header.stamp)
+            < self.pseudoMatchTime
+        ):
             if self.Once is True:
                 self.und_rec_map()
                 self.Once = False
 
             elif self.Once is False:
-                imgl = self.cvb.imgmsg_to_cv2(self.imgLeftMsg, desired_encoding="rgb8")
-                imgr = self.cvb.imgmsg_to_cv2(self.imgRightMsg, desired_encoding="rgb8")
+                imgl = self.cvb.imgmsg_to_cv2(
+                    self.imgLeftMsg, desired_encoding="rgb8"
+                )
+                imgr = self.cvb.imgmsg_to_cv2(
+                    self.imgRightMsg, desired_encoding="rgb8"
+                )
 
                 lremap = self.remap(imgl, self.leftmapx, self.leftmapy)
                 rremap = self.remap(imgr, self.Rightmapx, self.Rightmapy)
 
-                centerLeft = self.aruco_pixels(lremap, self.camLeftInfoMsg["k"], self.camLeftInfoMsg["d"])
-                centerRight = self.aruco_pixels(rremap, self.camRightInfoMsg["k"], self.camRightInfoMsg["d"])
+                centerLeft = self.aruco_pixels(
+                    lremap, self.camLeftInfoMsg["k"], self.camLeftInfoMsg["d"]
+                )
+                centerRight = self.aruco_pixels(
+                    rremap, self.camRightInfoMsg["k"], self.camRightInfoMsg["d"]
+                )
                 if centerLeft is not None and centerRight is not None:
 
-                    point3d = self.triangulate(np.array(centerLeft), np.array(centerRight))
+                    point3d = self.triangulate(
+                        np.array(centerLeft), np.array(centerRight)
+                    )
                     self.get_logger().info(f"point in 3d: {point3d}")
 
-                self.imgLeftDebugPub.publish(self.cvb.cv2_to_imgmsg(lremap, encoding="rgb8"))
-                self.imgRightDebugPub.publish(self.cvb.cv2_to_imgmsg(rremap, encoding="rgb8"))
+                self.imgLeftDebugPub.publish(
+                    self.cvb.cv2_to_imgmsg(lremap, encoding="rgb8")
+                )
+                self.imgRightDebugPub.publish(
+                    self.cvb.cv2_to_imgmsg(rremap, encoding="rgb8")
+                )
 
     def aruco_pixels(self, imageRectified):
         corners, ids, rej = self.detector.detectMarkers(imageRectified)
         centerx = None
         centery = None
         if not ids is None:
-            cv2.aruco.drawDetectedMarkers(imageRectified, corners, ids)  # aruco corner
+            cv2.aruco.drawDetectedMarkers(
+                imageRectified, corners, ids
+            )  # aruco corner
             for i in range(len(ids)):
                 centerx = (corners[i][0][0][0] + corners[i][0][2][0]) / 2
                 centery = (corners[i][0][0][1] + corners[i][0][2][1]) / 2
-                cv2.circle(imageRectified, (int(centerx), int(centery)), 15, (200, 2, 1), 3)
+                cv2.circle(
+                    imageRectified,
+                    (int(centerx), int(centery)),
+                    15,
+                    (200, 2, 1),
+                    3,
+                )
 
         return (centerx, centery)
 
@@ -118,7 +168,13 @@ class ImageProcessor(Node):
         if point2.dtype != "float64":
             point2 = point2.astype(np.float64)
 
-        point3d = cv2.triangulatePoints(self.camLeftInfoMsg["p"], self.camRightInfoMsg["p"], point1.reshape(2, 1), point2.reshape(2, 1), None).flatten()
+        point3d = cv2.triangulatePoints(
+            self.camLeftInfoMsg["p"],
+            self.camRightInfoMsg["p"],
+            point1.reshape(2, 1),
+            point2.reshape(2, 1),
+            None,
+        ).flatten()
         point3d /= point3d[-1]
         return point3d
 
@@ -129,8 +185,26 @@ class ImageProcessor(Node):
         lmapx, lmapy, rmapx, rmapy
         """
         if self.camLeftInfoMsg is not None and self.camRightInfoMsg is not None:
-            self.leftmapx, self.leftmapy = cv2.initUndistortRectifyMap(self.camLeftInfoMsg["k"], self.camLeftInfoMsg["d"], self.camLeftInfoMsg["r"], self.camLeftInfoMsg["p"], (self.camLeftInfoMsg["width"], self.camLeftInfoMsg["height"]), cv2.CV_32FC1, None, None)
-            self.Rightmapx, self.Rightmapy = cv2.initUndistortRectifyMap(self.camRightInfoMsg["k"], self.camRightInfoMsg["d"], self.camRightInfoMsg["r"], self.camRightInfoMsg["p"], (self.camRightInfoMsg["width"], self.camRightInfoMsg["height"]), cv2.CV_32FC1, None, None)
+            self.leftmapx, self.leftmapy = cv2.initUndistortRectifyMap(
+                self.camLeftInfoMsg["k"],
+                self.camLeftInfoMsg["d"],
+                self.camLeftInfoMsg["r"],
+                self.camLeftInfoMsg["p"],
+                (self.camLeftInfoMsg["width"], self.camLeftInfoMsg["height"]),
+                cv2.CV_32FC1,
+                None,
+                None,
+            )
+            self.Rightmapx, self.Rightmapy = cv2.initUndistortRectifyMap(
+                self.camRightInfoMsg["k"],
+                self.camRightInfoMsg["d"],
+                self.camRightInfoMsg["r"],
+                self.camRightInfoMsg["p"],
+                (self.camRightInfoMsg["width"], self.camRightInfoMsg["height"]),
+                cv2.CV_32FC1,
+                None,
+                None,
+            )
 
     def remap(self, src, mapx, mapy):
         return cv2.remap(src, mapx, mapy, cv2.INTER_LINEAR)

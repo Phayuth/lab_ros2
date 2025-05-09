@@ -7,7 +7,9 @@ class DepthInfoNode(Node):
 
     def __init__(self):
         super().__init__("depth_info_node")
-        self.depthsub = self.create_subscription(Image, "/camera/depth/image_rect_raw", self.process_depth_image, 10)
+        self.depthsub = self.create_subscription(
+            Image, "/camera/depth/image_rect_raw", self.process_depth_image, 10
+        )
 
     def process_depth_image(self, msg):
         px = 320  # X coordinate of the pixel

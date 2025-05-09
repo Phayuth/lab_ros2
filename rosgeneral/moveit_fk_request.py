@@ -7,17 +7,35 @@ from moveit_msgs.srv import GetPositionFK
 class FKClient(Node):
 
     def __init__(self):
-        super().__init__('fk_client')
-        self.client = self.create_client(GetPositionFK, 'compute_fk')
+        super().__init__("fk_client")
+        self.client = self.create_client(GetPositionFK, "compute_fk")
         while not self.client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('GetPositionFK service not available, waiting...')
+            self.get_logger().info(
+                "GetPositionFK service not available, waiting..."
+            )
 
     def send_request(self):
         request = GetPositionFK.Request()
-        request.header.frame_id = 'base_link'  # Set the desired frame ID
-        request.fk_link_names = ['tool0']  # Set the link for which you want to compute FK
-        request.robot_state.joint_state.name = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-        request.robot_state.joint_state.position = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  # Set the joint positions
+        request.header.frame_id = "base_link"  # Set the desired frame ID
+        request.fk_link_names = [
+            "tool0"
+        ]  # Set the link for which you want to compute FK
+        request.robot_state.joint_state.name = [
+            "shoulder_pan_joint",
+            "shoulder_lift_joint",
+            "elbow_joint",
+            "wrist_1_joint",
+            "wrist_2_joint",
+            "wrist_3_joint",
+        ]
+        request.robot_state.joint_state.position = [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]  # Set the joint positions
 
         self.future = self.client.call_async(request)
         rclpy.spin_until_future_complete(self, self.future)
@@ -46,5 +64,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

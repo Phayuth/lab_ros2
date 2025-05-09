@@ -1,6 +1,11 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import (
+    Command,
+    FindExecutable,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -9,7 +14,9 @@ def generate_launch_description():
     declared_arguments = []
     # UR specific arguments
     declared_arguments.append(
-        DeclareLaunchArgument("ur_type", description="Type/series of used UR robot.")
+        DeclareLaunchArgument(
+            "ur_type", description="Type/series of used UR robot."
+        )
     )
     # TODO(anyone): enable this when added into ROS2-foxy
     # choices=['ur3', 'ur3e', 'ur5', 'ur5e', 'ur10', 'ur10e', 'ur16e']))
@@ -71,16 +78,36 @@ def generate_launch_description():
     prefix = LaunchConfiguration("prefix")
 
     joint_limit_params = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", ur_type, "joint_limits.yaml"]
+        [
+            FindPackageShare(description_package),
+            "config",
+            ur_type,
+            "joint_limits.yaml",
+        ]
     )
     kinematics_params = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", ur_type, "default_kinematics.yaml"]
+        [
+            FindPackageShare(description_package),
+            "config",
+            ur_type,
+            "default_kinematics.yaml",
+        ]
     )
     physical_params = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", ur_type, "physical_parameters.yaml"]
+        [
+            FindPackageShare(description_package),
+            "config",
+            ur_type,
+            "physical_parameters.yaml",
+        ]
     )
     visual_params = PathJoinSubstitution(
-        [FindPackageShare(description_package), "config", ur_type, "visual_parameters.yaml"]
+        [
+            FindPackageShare(description_package),
+            "config",
+            ur_type,
+            "visual_parameters.yaml",
+        ]
     )
     script_filename = PathJoinSubstitution(
         [FindPackageShare("ur_robot_driver"), "resources", "ros_control.urscript"]
@@ -89,14 +116,20 @@ def generate_launch_description():
         [FindPackageShare("ur_robot_driver"), "resources", "rtde_input_recipe.txt"]
     )
     output_recipe_filename = PathJoinSubstitution(
-        [FindPackageShare("ur_robot_driver"), "resources", "rtde_output_recipe.txt"]
+        [
+            FindPackageShare("ur_robot_driver"),
+            "resources",
+            "rtde_output_recipe.txt",
+        ]
     )
 
     robot_description_content_start = Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
-            PathJoinSubstitution([FindPackageShare(description_package), "urdf", description_file]),
+            PathJoinSubstitution(
+                [FindPackageShare(description_package), "urdf", description_file]
+            ),
             " ",
             "joint_limit_params:=",
             joint_limit_params,
@@ -140,7 +173,9 @@ def generate_launch_description():
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
-            PathJoinSubstitution([FindPackageShare(description_package), "urdf", description_file]),
+            PathJoinSubstitution(
+                [FindPackageShare(description_package), "urdf", description_file]
+            ),
             " ",
             "joint_limit_params:=",
             joint_limit_params,
@@ -184,7 +219,9 @@ def generate_launch_description():
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
-            PathJoinSubstitution([FindPackageShare(description_package), "urdf", description_file]),
+            PathJoinSubstitution(
+                [FindPackageShare(description_package), "urdf", description_file]
+            ),
             " ",
             "joint_limit_params:=",
             joint_limit_params,
@@ -224,10 +261,13 @@ def generate_launch_description():
         ]
     )
 
-    robot_description_start = {"robot_description": robot_description_content_start}
-    robot_description_auxilary = {"robot_description": robot_description_content_auxilary}
+    robot_description_start = {
+        "robot_description": robot_description_content_start
+    }
+    robot_description_auxilary = {
+        "robot_description": robot_description_content_auxilary
+    }
     robot_description_goal = {"robot_description": robot_description_content_goal}
-
 
     # # joint state pub gui
     # joint_state_publisher_node_start = Node(
@@ -252,7 +292,7 @@ def generate_launch_description():
     robot_state_publisher_node_start = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        namespace='vs',
+        namespace="vs",
         output="both",
         parameters=[robot_description_start],
     )
@@ -260,15 +300,15 @@ def generate_launch_description():
     robot_state_publisher_node_auxilary = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        namespace='va',
+        namespace="va",
         output="both",
         parameters=[robot_description_auxilary],
-    )    
+    )
 
     robot_state_publisher_node_goal = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        namespace='vg',
+        namespace="vg",
         output="both",
         parameters=[robot_description_goal],
     )
@@ -279,26 +319,26 @@ def generate_launch_description():
         # joint_state_publisher_node_goal,
         robot_state_publisher_node_start,
         robot_state_publisher_node_auxilary,
-        robot_state_publisher_node_goal
+        robot_state_publisher_node_goal,
     ]
 
     # tf2
     world_to_start = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', '1', 'world', 'vs_base_link']
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=["0", "0", "0", "0", "0", "0", "1", "world", "vs_base_link"],
     )
 
     world_to_auxilary = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', '1', 'world', 'va_base_link']
-    )    
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=["0", "0", "0", "0", "0", "0", "1", "world", "va_base_link"],
+    )
 
     world_to_goal = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', '1', 'world', 'vg_base_link']
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=["0", "0", "0", "0", "0", "0", "1", "world", "vg_base_link"],
     )
 
     tf_list = [world_to_start, world_to_auxilary, world_to_goal]

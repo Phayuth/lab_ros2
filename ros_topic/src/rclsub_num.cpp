@@ -12,7 +12,12 @@ class SubscribeInterger : public rclcpp::Node {
 
     public:
         SubscribeInterger() : Node("int_sub") {
-            sub_ = this->create_subscription<std_msgs::msg::Int64>("int", 10, std::bind(&SubscribeInterger::subscribe_callback, this, std::placeholders::_1));
+            sub_ = this->create_subscription<std_msgs::msg::Int64>(
+                "int",
+                10,
+                std::bind(&SubscribeInterger::subscribe_callback,
+                          this,
+                          std::placeholders::_1));
         }
 };
 

@@ -2,7 +2,10 @@ from example_interfaces.srv import AddTwoInts
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
-from rclpy.callback_groups import ReentrantCallbackGroup, MutuallyExclusiveCallbackGroup
+from rclpy.callback_groups import (
+    ReentrantCallbackGroup,
+    MutuallyExclusiveCallbackGroup,
+)
 
 
 class MinimalClientAsyncNode(Node):
@@ -12,7 +15,9 @@ class MinimalClientAsyncNode(Node):
         self.cb1 = MutuallyExclusiveCallbackGroup()
         self.cb2 = MutuallyExclusiveCallbackGroup()
 
-        self.cli = self.create_client(AddTwoInts, "add_two_ints", callback_group=self.cb1)
+        self.cli = self.create_client(
+            AddTwoInts, "add_two_ints", callback_group=self.cb1
+        )
         while not self.cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("service not available, waiting again...")
         self.req = AddTwoInts.Request()
