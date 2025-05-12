@@ -3,6 +3,7 @@
 
 #include "kdl/chainfksolverpos_recursive.hpp"
 #include "kdl/chainiksolverpos_lma.hpp"
+#include "kdl/chainiksolverpos_nr.hpp"
 #include "kdl/frames_io.hpp"
 #include "kdl_parser/kdl_parser.hpp"
 #include "urdf/model.h"

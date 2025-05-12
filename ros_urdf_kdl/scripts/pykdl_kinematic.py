@@ -53,7 +53,9 @@ chain = make_kdl_from_urdf()
 numjoints = chain.getNrOfJoints()
 
 fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
-ik_solver = PyKDL.ChainIkSolverPos_LMA(chain)
+ikvel_solver = PyKDL.ChainIkSolverVel_pinv(chain)
+ik_solver = PyKDL.ChainIkSolverPos_NR(chain, fk_solver, ikvel_solver)
+# ik_solver = PyKDL.ChainIkSolverPos_LMA(chain)
 
 
 # Forward Kinematics
