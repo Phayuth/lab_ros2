@@ -626,13 +626,13 @@
     <visual>
       <!-- Gripper body -->
       <geometry>
-        <mesh filename="package://aljnump_description/meshes/sg/visual/sga_full.STL"
+        <mesh filename="package://onrobotsg_description/meshes/visual/sga_full.STL"
           scale="0.001 0.001 0.001" />
       </geometry>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://aljnump_description/meshes/sg/collision/plate_and_hub.STL"
+        <mesh filename="package://onrobotsg_description/meshes/collision/plate_and_hub.STL"
           scale="0.001 0.001 0.001" />
       </geometry>
     </collision>

@@ -13,10 +13,8 @@ int main(int /*argc*/, char * /*argv*/[]) {
     // Get the URDF and SRDF file paths.
     const auto package_share_path =
         ament_index_cpp::get_package_share_directory("ros_urdf");
-    const auto urdf_path =
-        std::filesystem::path(package_share_path) / "urdf" / "ur5e_onsga.urdf";
-    const auto srdf_path =
-        std::filesystem::path(package_share_path) / "urdf" / "ur5e_onsga.srdf";
+    const auto urdf_path = package_share_path + "/urdf/ur5e_onsga.urdf";
+    const auto srdf_path = package_share_path + "/urdf/ur5e_onsga.srdf";
 
     // Create a set of Pinocchio models and data.
     pinocchio::Model model;
@@ -41,11 +39,22 @@ int main(int /*argc*/, char * /*argv*/[]) {
               << q << std::endl
               << std::endl;
 
+    // Random joint configuration
+    Eigen::VectorXd qmin(model.nq);
+    Eigen::VectorXd qmax(model.nq);
+    qmin << -2 * M_PI, -2 * M_PI, -2 * M_PI, -2 * M_PI, -2 * M_PI, -2 * M_PI;
+    qmax << 2 * M_PI, 2 * M_PI, 2 * M_PI, 2 * M_PI, 2 * M_PI, 2 * M_PI;
+    Eigen::VectorXd qrand(model.nq);
+    pinocchio::randomConfiguration(model, qmin, qmax, qrand);
+    std::cout << "Random Joint configuration: " << std::endl
+              << qrand << std::endl
+              << std::endl;
+
     // Get the frame ID of the end effector for later lookups.
     const auto ee_frame_id = model.getFrameId("onrobotsg_tip");
 
     // Perform forward kinematics and get a transform.
-    pinocchio::framesForwardKinematics(model, data, q);
+    pinocchio::framesForwardKinematics(model, data, qrand);
     std::cout << "Frame transform: " << std::endl
               << data.oMf[ee_frame_id] << std::endl;
 
