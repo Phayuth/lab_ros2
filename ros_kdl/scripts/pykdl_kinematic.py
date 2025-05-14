@@ -6,6 +6,7 @@
 import PyKDL
 import numpy as np
 import urdfkdl
+from ament_index_python import get_package_share_directory
 
 
 def make_kdl_from_dh():
